@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "_macro.html" as macro%}
+{% block subtitle %} -用户版本信息统计{% endblock %}
+{% block page_content %}
+<form class="form-inline panel panel-default" action="{{url_for('manage.get_user_plugin_frame_version')}}", method="post">
+    {{ form.csrf_token }}
+    <div class="panel-body">
+        <div class="form-group">
+            {{ form.imei.label }}:
+            {{ form.imei(class="form-control", placeholder="完整或或部分imei") }}
+        </div>
+        <div class="form-group">
+			<a href="{{url_for('manage.get_user_plugin_frame_version')}}" class="btn btn-primary">重置</a>
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </div>
+</form>
+<div class="tab-content">
+	<div class="tab-pane active">
+		<table id="appinfo" class="table table-striped table-hover table-bordered">
+			<thead>
+				<tr class="info">
+					<td class="text-center">ID</td>
+                    <td class="text-center">imei</td>
+                    <td class="text-center">框架</td>
+                    <td class="text-center">launcher</td>
+                    <td class="text-center">设置</td>
+                    <td class="text-center">应用导入</td>
+                    <td class="text-center">联系人</td>
+                    <td class="text-center">引导页</td>
+                    <td class="text-center">联系人存储</td>
+                    <td class="text-center">备忘录</td>
+				</tr>
+			</thead>
+			<tbody>
+			{% for item in data %}
+			<tr>
+				<td class="text-center">{{ item.id }}</td>
+				<td class="text-center">{{ item.imei }}</td>
+                <td class="text-center">{{ item.frame_version }}</td>
+                <td class="text-center">{{ item.launcher_version }}</td>
+                <td class="text-center">{{ item.settings_version }}</td>
+                <td class="text-center">{{ item.import_app_version }}</td>
+                <td class="text-center">{{ item.contacts_version }}</td>
+                <td class="text-center">{{ item.guide_page_version }}</td>
+                <td class="text-center">{{ item.providers_contacts_version }}</td>
+                <td class="text-center">{{ item.memorandum_version }}</td>
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+        <a href="{{url_for('manage.export_result', imei=form.imei.data, export_type = 7)}}"
+           class="btn btn-primary">导出结果为<br/>excel表格</a>
+	</div>
+</div>
+{% endblock %}
+{% block page%}
+	{{ macro.pagination_widget(pagination, 'manage.get_user_plugin_frame_version', imei=form.imei.data) }}
+{% endblock %}

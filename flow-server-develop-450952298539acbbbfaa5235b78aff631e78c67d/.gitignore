@@ -1,0 +1,14 @@
+.idea
+*.pyc
+venv/
+log/*.log
+log/*/*.log
+log/*.pid
+AvatarException/*.log
+AvatarApk/*/*.apk
+AvatarPhoto/*.jpg
+*.pid
+*.db
+celerybeat-schedule*
+__pycache__/
+migrations/

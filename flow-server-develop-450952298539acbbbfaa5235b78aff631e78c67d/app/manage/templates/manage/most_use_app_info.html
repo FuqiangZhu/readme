@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% import "_macro.html" as macro%}
+{% block subtitle %} -应用使用{% endblock %}
+
+{% block page_content %}
+<form class="form-inline panel panel-default" action="{{url_for('manage.get_most_use_app_info')}}", method="post">
+    {{ form.csrf_token }}
+    <div class="panel-body">
+        <div class="form-group">
+            {{ form.app_source.label }}:
+            {{ form.app_source(class="form-control") }}
+        </div>
+        <div class="form-group">
+			<a href="{{url_for('manage.get_most_use_app_info')}}" class="btn btn-primary">重置</a>
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </div>
+</form>
+<div class="tab-content">
+	<div class="tab-pane active">
+		<table id="appinfo" class="table table-striped table-hover table-bordered">
+			<thead>
+				<tr class="info">
+					<td class="text-center">包名</td>
+					<td class="text-center">应用名</td>
+					<td class="text-center">使用次数</td>
+				</tr>
+			</thead>
+			<tbody>
+			{% for temp in data %}
+			<tr>
+				<td class="text-center">{{ temp.package_name }}</td>
+				<td class="text-center">{{ temp.app_name }}</td>
+				<td class="text-center">{{ temp.count }}</td>
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		<a href="{{url_for('manage.export_result', app_source=form.app_source.data, export_type = 3)}}" class="btn btn-primary">导出结果为<br/>excel表格</a>
+	</div>
+</div>
+
+{% endblock %}
+{% block page %}
+	{{ macro.pagination_widget(pagination, 'manage.get_most_use_app_info', app_source=form.app_source.data) }}
+{% endblock %}

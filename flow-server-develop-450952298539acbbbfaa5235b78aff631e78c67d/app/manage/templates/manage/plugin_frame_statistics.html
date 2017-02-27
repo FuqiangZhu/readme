@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% import "_macro.html" as macro%}
+{% block subtitle %} -插件使用人数统计{% endblock %}
+{% block page_content %}
+<form class="form-inline panel panel-default" action="{{url_for('manage.get_plugin_frame_statistics')}}", method="post">
+    {{ form.csrf_token }}
+    <div class="panel-body">
+        <div class="form-group">
+            {{ form.version_name.label }}:
+            {{ form.version_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+			<a href="{{url_for('manage.get_plugin_frame_statistics')}}" class="btn btn-primary">重置</a>
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </div>
+</form>
+<div class="tab-content">
+	<div class="tab-pane active">
+		<table id="appinfo" class="table table-striped table-hover table-bordered">
+			<thead>
+				<tr class="info">
+					<td class="text-center">ID</td>
+                    <td class="text-center">应用版本</td>
+                    <td class="text-center">安装数</td>
+				</tr>
+			</thead>
+			<tbody>
+			{% for item in data %}
+			<tr>
+				<td class="text-center">{{ item.id }}</td>
+                <td class="text-center">{{ item.version_name }}</td>
+                <td class="text-center">{{ item.count }}</td>
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+        <a href="{{url_for('manage.export_result', version_name=form.version_name.data, export_type = 6)}}"
+           class="btn btn-primary">导出结果为<br/>excel表格</a>
+	</div>
+</div>
+{% endblock %}
+{% block page%}
+	{{ macro.pagination_widget(pagination, 'manage.get_plugin_frame_statistics', version_name=form.version_name.data) }}
+{% endblock %}

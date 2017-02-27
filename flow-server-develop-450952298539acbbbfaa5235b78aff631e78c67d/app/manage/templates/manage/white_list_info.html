@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% import "_macro.html" as macro%}
+{% block subtitle %} -白名单信息{% endblock %}
+
+{% block page_content %}
+<form class="form-inline panel panel-default" action="{{url_for('manage.get_white_list_info')}}", method="post">
+    {{ form.csrf_token }}
+    <div class="panel-body">
+		<div class="form-group">
+            {{ form.app_name.label }}:
+            {{ form.app_name(class="form-control", placeholder="完整或或部分应用名") }}
+        </div>
+        <div class="form-group">
+            {{ form.package_name.label }}:
+            {{ form.package_name(class="form-control", placeholder="完整或或部分包名") }}
+        </div>
+		<div class="form-group">
+            {{ form.version_code.label }}:
+            {{ form.version_code(class="form-control") }}
+        </div>
+        <div class="form-group">
+			<a href="{{url_for('manage.get_white_list_info')}}" class="btn btn-primary">重置</a>
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </div>
+</form>
+<div class="tab-content">
+	<div class="tab-pane active">
+		<table id="appinfo" class="table table-striped table-hover table-bordered">
+			<thead>
+				<tr class="info">
+					<td class="text-center">ID</td>
+					<td class="text-center">应用名</td>
+					<td class="text-center">应用包</td>
+                    <td class="text-center">白名单版本号</td>
+					{% if current_user.can(Role.USER, Department.DEVELOP_SU) or
+                        current_user.can(Role.USER, Department.PM) %}
+					<td class="text-center">操作</td>
+					{% endif %}
+				</tr>
+			</thead>
+			<tbody>
+			{% for temp in data %}
+			<tr>
+				<td class="text-center">{{temp.id}}</td>
+				<td class="text-center">{{temp.app_name}}</td>
+				<td class="text-center">{{temp.package_name}}</td>
+                <td class="text-center">{{temp.version_code}}</td>
+				{% if current_user.can(Role.USER, Department.DEVELOP_SU) or
+                        current_user.can(Role.USER, Department.PM) %}
+				<td class="text-center"><a onclick="del_record('{{temp.package_name}}')" class="btn btn-danger btn-xs">删除</a></td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+<script>
+	function del_record(package_name)
+	{
+		$.ajax({
+			  url: "{{url_for('manage.del_white_list')}}",
+			  data: {"package_name":package_name},
+			  type: "GET",
+			  dataType: "json",
+			  async: false,
+			  cache: false
+			}).done(function( result ) {
+				if(result["code"] != 0){ //如果出错则为非0
+					alert('删除失败');
+				}else{
+					alert('删除成功!');
+					parent.location.reload();
+				}
+			}).fail(function(result){
+				var errmsg = "访问服务器出错："+fmtJqueryAjaxError(result);
+				alert(errmsg);
+			});
+	}
+</script>
+{% endblock %}
+{% block page %}
+	{{ macro.pagination_widget(pagination, 'manage.get_white_list_info', app_name=form.app_name.data,
+package_name=form.package_name.data, version_code=form.version_code.data) }}
+{% endblock %}
